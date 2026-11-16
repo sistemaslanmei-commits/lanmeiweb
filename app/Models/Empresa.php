@@ -53,5 +53,18 @@ class Empresa extends Model
                 }
             }
         });
+
+        // Dentro de booted() en app/Models/Empresa.php
+        static::saved(function (Empresa $empresa) {
+            if ($empresa->wasChanged('porcentaje_deltron')) {
+                $multiplicador = 1 + ($empresa->porcentaje_deltron / 100);
+
+                \App\Models\DeltronProducto::query()->update([
+                    'precio' => \Illuminate\Support\Facades\DB::raw("ROUND(precio_costo_soles * {$multiplicador}, 2)"),
+                ]);
+            }
+        });
+
+        
     }
 }
